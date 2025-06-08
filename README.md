@@ -5,6 +5,77 @@
 
 # RUS
 
+## Диграмма классов
+```mermaid
+classDiagram
+    %% Main Interfaces
+    class IGiffable {
+        <<interface>>
+        +load_image(file) void
+        +process() void
+        +get_table() map~string,int~
+        +get_next_frame(tag, index) tuple~uint8_t,size_t~
+        +get_type(tag) optional~uint8_t~
+        +get_frame_delay() uint64_t
+    }
+
+    class IGifEventBinder {
+        <<interface>>
+        +set_on_frame(callback) void
+    }
+
+    %% Core Components
+    class gif_animator {
+        +update(current_time_ms) void
+        +toggle() void
+        +should_render() bool
+        +get_image() tuple~uint8_t*,size_t~
+        +set_on_frame(callback) void
+        -handler_ : gif_node_handler
+        -frame_delay_ms_ : uint64_t
+        -last_update_called_ : uint64_t
+        -playing_ : bool
+    }
+    IGifEventBinder <|.. gif_animator : implements
+
+    class giffable_factory~T~ {
+        +process_data(file) unordered_map~string, gif_animator~
+        -processor_ : unique_ptr~IGiffable~
+        -clear() void
+        -reset() void
+        -load_file(file) void
+        -get_table() unordered_map~string,int~
+        -get_type(tag) uint8_t
+        -get_delay() uint64_t
+    }
+    giffable_factory ..> IGiffable : uses
+
+    %% Internal Implementation
+    class gif_node_handler {
+        +create_cycle() void
+        +create_pingpong() void
+        +reverse() void
+        +add_data(data, size) void
+        +get_data() tuple~uint8_t*,size_t,size_t~
+        -node_ : gif_node*
+        -first_element_ : gif_node*
+        -status_ : LIST_STATUS
+    }
+
+    class gif_node {
+        -prev_ : gif_node*
+        -next_ : gif_node*
+        -size_ : size_t
+        -data_ : uint8_t*
+        +get_data() tuple~uint8_t*,size_t~
+        +create_next(next, size) gif_node*
+    }
+
+    gif_animator *-- gif_node_handler : contains
+    gif_node_handler *-- gif_node : manages
+    giffable_factory ..> gif_animator : creates
+```
+
 ## Обзор
 Библиотека предоставляет систему для загрузки, обработки и воспроизведения анимированных GIF. Основные компоненты:
 
@@ -87,6 +158,78 @@ if (animator.should_render()) {
 ---
 ---
 # ENG
+
+## Class diagram
+
+```mermaid
+classDiagram
+    %% Main Interfaces
+    class IGiffable {
+        <<interface>>
+        +load_image(file) void
+        +process() void
+        +get_table() map~string,int~
+        +get_next_frame(tag, index) tuple~uint8_t,size_t~
+        +get_type(tag) optional~uint8_t~
+        +get_frame_delay() uint64_t
+    }
+
+    class IGifEventBinder {
+        <<interface>>
+        +set_on_frame(callback) void
+    }
+
+    %% Core Components
+    class gif_animator {
+        +update(current_time_ms) void
+        +toggle() void
+        +should_render() bool
+        +get_image() tuple~uint8_t*,size_t~
+        +set_on_frame(callback) void
+        -handler_ : gif_node_handler
+        -frame_delay_ms_ : uint64_t
+        -last_update_called_ : uint64_t
+        -playing_ : bool
+    }
+    IGifEventBinder <|.. gif_animator : implements
+
+    class giffable_factory~T~ {
+        +process_data(file) unordered_map~string, gif_animator~
+        -processor_ : unique_ptr~IGiffable~
+        -clear() void
+        -reset() void
+        -load_file(file) void
+        -get_table() unordered_map~string,int~
+        -get_type(tag) uint8_t
+        -get_delay() uint64_t
+    }
+    giffable_factory ..> IGiffable : uses
+
+    %% Internal Implementation
+    class gif_node_handler {
+        +create_cycle() void
+        +create_pingpong() void
+        +reverse() void
+        +add_data(data, size) void
+        +get_data() tuple~uint8_t*,size_t,size_t~
+        -node_ : gif_node*
+        -first_element_ : gif_node*
+        -status_ : LIST_STATUS
+    }
+
+    class gif_node {
+        -prev_ : gif_node*
+        -next_ : gif_node*
+        -size_ : size_t
+        -data_ : uint8_t*
+        +get_data() tuple~uint8_t*,size_t~
+        +create_next(next, size) gif_node*
+    }
+
+    gif_animator *-- gif_node_handler : contains
+    gif_node_handler *-- gif_node : manages
+    giffable_factory ..> gif_animator : creates
+```
 
 ## Overview
 A C++ library for loading, processing, and animating GIF images. Provides a high-level API for GIF manipulation while handling low-level details internally.
