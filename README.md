@@ -3,7 +3,7 @@
 [🇷🇺 Русская версия](#rus) | [🇬🇧 English version](#eng)
 
 
-# RU
+# RUS
 
 ## Обзор
 Библиотека предоставляет систему для загрузки, обработки и воспроизведения анимированных GIF. Основные компоненты:
@@ -86,7 +86,7 @@ if (animator.should_render()) {
 
 ---
 ---
-# EN
+# ENG
 
 ## Overview
 A C++ library for loading, processing, and animating GIF images. Provides a high-level API for GIF manipulation while handling low-level details internally.
